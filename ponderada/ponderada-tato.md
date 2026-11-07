@@ -238,9 +238,9 @@ Código em [`codigo/`](codigo/). Python 3, N = 3, 20.000 amostras, 3 execuções
 
 | versão | exec. | produzidas | consumidas | perdidas | duplicadas | travou |
 |---|---|---|---|---|---|---|
-| 1 (sem sincronização) | 1 | 19970 | 20000 | 713 | 743 | não |
-| 1 | 2 | 19897 | 20000 | 638 | 741 | não |
-| 1 | 3 | 20000 | 19999 | 412 | 411 | **sim** |
+| 1 (sem sincronização) | 1 | 19872 | 20000 | 766 | 894 | não |
+| 1 | 2 | 19912 | 20000 | 598 | 686 | não |
+| 1 | 3 | 20000 | 19991 | 724 | 715 | **sim** |
 | 2 (semáforos) | 1 | 20000 | 20000 | 0 | 0 | não |
 | 2 | 2 | 20000 | 20000 | 0 | 0 | não |
 | 2 | 3 | 20000 | 20000 | 0 | 0 | não |
@@ -271,7 +271,7 @@ A região crítica é o trio **ler `ocupadas`, `sleep(0)`, escrever `ocupadas`**
 - **Contador menor que o real:** o produtor acha que há vaga onde ainda há amostra não lida e a sobrescreve. A amostra é **perdida**.
 - **Contador maior que o real:** o consumidor acha que há amostra onde a posição já foi lida e lê de novo. A amostra é **duplicada**.
 
-Nas execuções 1 e 2 o consumidor fez 20.000 leituras mesmo com só 19.970 e 19.897 amostras produzidas: ele leu posições velhas, e isso é a duplicata. Na execução 3 o contador corrompido deixou o consumidor esperando uma amostra que não chegou: travou.
+Nas execuções 1 e 2 o consumidor fez 20.000 leituras mesmo com só 19.872 e 19.912 amostras produzidas: ele leu posições velhas, e isso é a duplicata. Na execução 3 o contador corrompido deixou o consumidor esperando uma amostra que não chegou: travou.
 
 ### O que cada semáforo garante na versão 2
 
