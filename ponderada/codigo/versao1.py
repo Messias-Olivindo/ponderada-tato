@@ -1,6 +1,6 @@
 """Versao 1 da A4: produtor/consumidor SEM sincronizacao (contador compartilhado, espera ocupada).
 
-Parametros: N=3 posicoes no buffer circular, 20.000 amostras (0..19999),
+Parametros: N=4 posicoes no buffer circular, 20.000 amostras (0..19999),
 3 execucoes em sequencia. Produtor = thread do sensor, consumidor = thread
 do motor. Uma thread principal vigia: 1 s sem o consumidor receber nada
 conta como travamento.
@@ -13,7 +13,7 @@ import os
 import threading
 import time
 
-N = 3             # tamanho do buffer circular
+N = 4             # tamanho do buffer circular
 AMOSTRAS = 20000  # amostras numeradas 0..19999
 EXECUCOES = 3     # execucoes em sequencia
 TIMEOUT = 1.0     # segundos sem o consumidor receber nada = travamento

@@ -1,4 +1,4 @@
-**Aluno:** Messias Olivindo | **D1** = 7 | **D2** = 5 | **N** = 3
+**Aluno:** Messias Fernandes de Olivindo | **D1** = 7 | **D2** = 6 | **N** = 4
 
 # Ponderada CC08: do pipeline ao deadlock (Tato)
 
@@ -7,10 +7,10 @@
 | parâmetro | conta | valor |
 |---|---|---|
 | D1 | "Messias" tem 7 letras | **7** |
-| D2 | 7 + 8 ("Olivindo") = 15 letras; último dígito | **5** |
-| IC (instruções por amostra) | 100.000 + 20.000 × 5 | **200.000** |
+| D2 | 7 ("Messias") + 9 ("Fernandes") + 2 ("de") + 8 ("Olivindo") = 26 letras; último dígito | **6** |
+| IC (instruções por amostra) | 100.000 + 20.000 × 6 | **220.000** |
 | m (taxa de falta na L1) | 3% + 0,5% × 7 | **6,5%** |
-| N (buffer da A4) | 3 + (5 mod 5) = 3 + 0 | **3** |
+| N (buffer da A4) | 3 + (6 mod 5) = 3 + 1 | **4** |
 
 ---
 
@@ -21,11 +21,11 @@
 ### A1.1 Plataforma H, tempo por amostra
 
 ```
-ciclos = IC × CPI           = 200.000 × 1,5   = 300.000 ciclos
-tempo  = ciclos / clock     = 300.000 / 48 MHz = 6,25 ms
+ciclos = IC × CPI           = 220.000 × 1,5   = 330.000 ciclos
+tempo  = ciclos / clock     = 330.000 / 48 MHz = 6,875 ms
 ```
 
-**Não atende.** 6,25 ms > 5 ms (estoura em 1,25 ms, 25% acima do limite). Na H não há cache nem SO, então não existe pior caso diferente: o tempo é sempre 6,25 ms.
+**Não atende.** 6,875 ms > 5 ms (estoura em 1,875 ms, 37,5% acima do limite). Na H não há cache nem SO, então não existe pior caso diferente: o tempo é sempre 6,875 ms.
 
 ### A1.2 Plataforma V, AMAT, CPI efetivo e pior caso
 
@@ -36,12 +36,12 @@ AMAT = tempo de acerto + m × penalidade
 CPI efetivo = 1,0 + (acessos por instrução × m × penalidade)
             = 1,0 + (1,3 × 0,065 × 120) = 1,0 + 10,14 = 11,14
 
-ciclos = 200.000 × 11,14        = 2.228.000 ciclos
-tempo  = 2.228.000 / 1,2 GHz    = 1,857 ms
-pior caso = 1,857 ms + 3 ms (Linux) = 4,857 ms
+ciclos = 220.000 × 11,14        = 2.450.800 ciclos
+tempo  = 2.450.800 / 1,2 GHz    = 2,042 ms
+pior caso = 2,042 ms + 3 ms (Linux) = 5,042 ms
 ```
 
-**Atende, por pouco.** 4,857 ms < 5 ms, com folga de **0,143 ms (2,9%)**. A folga depende de o Linux nunca passar de 3 ms.
+**Não atende, por pouco.** No caso médio cabe (2,042 ms), mas no pior caso 5,042 ms > 5 ms: estoura em **0,042 ms (0,8%)**. Para caber, o atraso do Linux teria que ficar abaixo de 5 − 2,042 = 2,958 ms.
 
 ### A1.3 Plataforma H com DSP (Lei de Amdahl)
 
@@ -49,22 +49,22 @@ pior caso = 1,857 ms + 3 ms (Linux) = 4,857 ms
 S = 1 / ((1 − f) + f / s) = 1 / ((1 − 0,6) + 0,6 / 5)
   = 1 / (0,4 + 0,12) = 1 / 0,52 = 1,923
 
-tempo novo = 6,25 ms / 1,923 = 3,25 ms     (confere: 6,25 × 0,52)
+tempo novo = 6,875 ms / 1,923 = 3,575 ms     (confere: 6,875 × 0,52)
 ```
 
-**Atende**, com folga de **1,75 ms (35%)**, e sem sistema operacional que possa atrasar a tarefa.
+**Atende**, com folga de **1,425 ms (28,5%)**, e sem sistema operacional que possa atrasar a tarefa.
 
 ### Resumo da A1
 
 | plataforma | tempo por amostra | pior caso | atende 5 ms? | folga |
 |---|---|---|---|---|
-| H | 6,25 ms | 6,25 ms | não | −1,25 ms |
-| V | 1,857 ms | 4,857 ms | sim | 0,143 ms |
-| H + DSP | 3,25 ms | 3,25 ms | sim | 1,75 ms |
+| H | 6,875 ms | 6,875 ms | não | −1,875 ms |
+| V | 2,042 ms | 5,042 ms | não | −0,042 ms |
+| H + DSP | 3,575 ms | 3,575 ms | sim | 1,425 ms |
 
 ### A1.4 Por que a V precisa de cache e a H funciona sem
 
-Na V, instruções e dados passam pelo mesmo caminho até a DRAM, que custa 120 ciclos por acesso: esse é o gargalo de Von Neumann. Sem cache, cada instrução (1,3 acessos) custaria 1,3 × 120 = 156 ciclos a mais: CPI = 157, tempo = 200.000 × 157 / 1,2 GHz = **26,2 ms**, mais de 5 vezes o limite. A cache L1 (acerto em 1 ciclo) esconde a DRAM. A H é Harvard: memória de instruções e de dados separadas, ambas SRAM interna de 1 ciclo. Busca de instrução e acesso a dado acontecem em paralelo e nunca esperam uma DRAM, então não há gargalo para esconder.
+Na V, instruções e dados passam pelo mesmo caminho até a DRAM, que custa 120 ciclos por acesso: esse é o gargalo de Von Neumann. Sem cache, cada instrução (1,3 acessos) custaria 1,3 × 120 = 156 ciclos a mais: CPI = 157, tempo = 220.000 × 157 / 1,2 GHz = **28,8 ms**, mais de 5 vezes o limite. A cache L1 (acerto em 1 ciclo) esconde a DRAM. A H é Harvard: memória de instruções e de dados separadas, ambas SRAM interna de 1 ciclo. Busca de instrução e acesso a dado acontecem em paralelo e nunca esperam uma DRAM, então não há gargalo para esconder.
 
 ### A1.5 Evidência da minha máquina
 
@@ -195,7 +195,7 @@ Nova ordem: trocar as linhas 2 e 3 (`lw x7` sobe, `add` desce). O resultado não
 | troca de contexto | mais barata (mesmo espaço de endereços) | mais cara, mas fora do caminho dos 5 ms |
 | isolamento de falhas | sem isolamento: uma thread com defeito derruba o processo inteiro | se o BLE travar ou cair, o sensor e o motor continuam |
 
-**Ligação com a A1:** na V a folga é de só 0,143 ms. Por isso o caminho crítico (sensor → processar → motor) fica em threads do mesmo processo, sem IPC no meio. A comunicação por IPC só existe para log e configuração, que não precisam cumprir os 5 ms.
+**Ligação com a A1:** na V o pior caso (5,042 ms) já passa 0,042 ms dos 5 ms, então não há folga para gastar com comunicação. Por isso o caminho crítico (sensor → processar → motor) fica em threads do mesmo processo, sem IPC no meio. A comunicação por IPC só existe para log e configuração, que não precisam cumprir os 5 ms.
 
 ### A3.2 BLE como thread × como processo
 
@@ -226,35 +226,56 @@ O processo separado não torna o BLE invulnerável, mas a MMU do sistema operaci
 
 Transições: novo → pronto; pronto → executando; executando → pronto (preempção); executando → bloqueado (espera timer ou I/O); bloqueado → pronto (evento ocorreu); executando → terminado.
 
-**Em que estado a thread do sensor passa mais tempo? Bloqueado.** Ela só precisa agir a cada 10 ms (100 amostras por segundo) e passa o resto esperando o timer e a resposta do barramento. Mesmo supondo o pior caso, em que ela gaste todo o tempo de processamento da amostra executando (1,857 ms em cada 10 ms), ela ficaria **no máximo 18,6% executando e pelo menos 81,4% bloqueada**.
+**Em que estado a thread do sensor passa mais tempo? Bloqueado.** Ela só precisa agir a cada 10 ms (100 amostras por segundo) e passa o resto esperando o timer e a resposta do barramento. Mesmo supondo o pior caso, em que ela gaste todo o tempo de processamento da amostra executando (2,042 ms em cada 10 ms), ela ficaria **no máximo 20,4% executando e pelo menos 79,6% bloqueada**.
 
 ---
 
 ## A4. Código com semáforos: o buffer entre o sensor e o motor
 
-Código em [`codigo/`](codigo/). Python 3, N = 3, 20.000 amostras, 3 execuções por versão. Um vigia encerra o programa quando o consumidor passa 1 s sem receber nada e registra "travou".
+Código em [`codigo/`](codigo/). Python 3, N = 4, 20.000 amostras, 3 execuções por versão. Um vigia encerra o programa quando o consumidor passa 1 s sem receber nada e registra "travou".
 
 **Como contei:** *produzidas* = amostras que o produtor gerou; *consumidas* = leituras do consumidor; *perdidas* = amostras produzidas que o consumidor nunca recebeu; *duplicadas* = repetições de amostras que o consumidor recebeu mais de uma vez.
 
 | versão | exec. | produzidas | consumidas | perdidas | duplicadas | travou |
 |---|---|---|---|---|---|---|
-| 1 (sem sincronização) | 1 | 19872 | 20000 | 766 | 894 | não |
-| 1 | 2 | 19912 | 20000 | 598 | 686 | não |
-| 1 | 3 | 20000 | 19991 | 724 | 715 | **sim** |
+| 1 (sem sincronização) | 1 | 20000 | 19998 | 568 | 566 | **sim** |
+| 1 | 2 | 20000 | 19993 | 511 | 504 | **sim** |
+| 1 | 3 | 7109 | 7113 | 179 | 183 | **sim** |
 | 2 (semáforos) | 1 | 20000 | 20000 | 0 | 0 | não |
 | 2 | 2 | 20000 | 20000 | 0 | 0 | não |
 | 2 | 3 | 20000 | 20000 | 0 | 0 | não |
-| 3 (ordem trocada) | 1 | 3 | 0 | 3 | 0 | **sim** |
-| 3 | 2 | 3 | 0 | 3 | 0 | **sim** |
-| 3 | 3 | 3 | 0 | 3 | 0 | **sim** |
+| 3 (ordem trocada) | 1 | 4 | 0 | 4 | 0 | **sim** |
+| 3 | 2 | 4 | 0 | 4 | 0 | **sim** |
+| 3 | 3 | 4 | 0 | 4 | 0 | **sim** |
 
-Prints de uma execução de cada versão:
+Saída do terminal das execuções de cada versão:
 
-![versão 1](img/a4-versao1.png)
+Versão 1 (`python3 versao1.py`):
 
-![versão 2](img/a4-versao2.png)
+```
+Versao 1 (sem sincronizacao) | N=4 | amostras=20000
+RESULTADO versao=1 execucao=1 produzidas=20000 consumidas=19998 perdidas=568 duplicadas=566 travou=sim
+RESULTADO versao=1 execucao=2 produzidas=20000 consumidas=19993 perdidas=511 duplicadas=504 travou=sim
+RESULTADO versao=1 execucao=3 produzidas=7109 consumidas=7113 perdidas=179 duplicadas=183 travou=sim
+```
 
-![versão 3](img/a4-versao3.png)
+Versão 2 (`python3 versao2.py`):
+
+```
+Versao 2 (semaforos) | N=4 | amostras=20000
+RESULTADO versao=2 execucao=1 produzidas=20000 consumidas=20000 perdidas=0 duplicadas=0 travou=nao
+RESULTADO versao=2 execucao=2 produzidas=20000 consumidas=20000 perdidas=0 duplicadas=0 travou=nao
+RESULTADO versao=2 execucao=3 produzidas=20000 consumidas=20000 perdidas=0 duplicadas=0 travou=nao
+```
+
+Versão 3 (`python3 versao3.py`):
+
+```
+Versao 3 (ordem trocada) | N=4 | amostras=20000
+RESULTADO versao=3 execucao=1 produzidas=4 consumidas=0 perdidas=4 duplicadas=0 travou=sim
+RESULTADO versao=3 execucao=2 produzidas=4 consumidas=0 perdidas=4 duplicadas=0 travou=sim
+RESULTADO versao=3 execucao=3 produzidas=4 consumidas=0 perdidas=4 duplicadas=0 travou=sim
+```
 
 ### Região crítica da versão 1 e por que perde e duplica
 
@@ -271,13 +292,13 @@ A região crítica é o trio **ler `ocupadas`, `sleep(0)`, escrever `ocupadas`**
 - **Contador menor que o real:** o produtor acha que há vaga onde ainda há amostra não lida e a sobrescreve. A amostra é **perdida**.
 - **Contador maior que o real:** o consumidor acha que há amostra onde a posição já foi lida e lê de novo. A amostra é **duplicada**.
 
-Nas execuções 1 e 2 o consumidor fez 20.000 leituras mesmo com só 19.872 e 19.912 amostras produzidas: ele leu posições velhas, e isso é a duplicata. Na execução 3 o contador corrompido deixou o consumidor esperando uma amostra que não chegou: travou.
+Nas três execuções o contador corrompido acabou deixando o consumidor 1 s sem receber nada, e o vigia encerrou por travamento. Nas execuções 1 e 2 isso só aconteceu no final, depois de o produtor gerar as 20.000 amostras; na execução 3 aconteceu no meio, com 7.109 produzidas. Em todas houve perda e duplicata: o consumidor leu posições velhas (duplicata) e o produtor sobrescreveu posições não lidas (perda).
 
 ### O que cada semáforo garante na versão 2
 
 | semáforo | começa em | garante |
 |---|---|---|
-| `vazio` | N = 3 | conta as vagas livres: o produtor **bloqueia com o buffer cheio** e nunca sobrescreve uma amostra não lida |
+| `vazio` | N = 4 | conta as vagas livres: o produtor **bloqueia com o buffer cheio** e nunca sobrescreve uma amostra não lida |
 | `cheio` | 0 | conta as amostras disponíveis: o consumidor **bloqueia com o buffer vazio** e nunca lê posição velha |
 | `mutex` | 1 | exclusão mútua: só **uma thread por vez** mexe nos índices e no buffer |
 
@@ -285,14 +306,14 @@ Os três juntos eliminam a condição de corrida (0 perdidas, 0 duplicadas) e ta
 
 ### O que aconteceu na versão 3 e por quê
 
-O produtor passou a pegar o `mutex` **antes** de esperar uma vaga em `vazio`. Com N = 3, ele grava 3 amostras, tenta uma 4ª, encontra o buffer cheio e **fica esperando `vazio` segurando o `mutex`**. O consumidor precisa do `mutex` para ler e liberar uma vaga: ele espera o produtor, e o produtor espera o consumidor. Nenhum dos dois avança: **deadlock**.
+O produtor passou a pegar o `mutex` **antes** de esperar uma vaga em `vazio`. Com N = 4, ele grava 4 amostras, tenta uma 5ª, encontra o buffer cheio e **fica esperando `vazio` segurando o `mutex`**. O consumidor precisa do `mutex` para ler e liberar uma vaga: ele espera o produtor, e o produtor espera o consumidor. Nenhum dos dois avança: **deadlock**.
 
 ```
  produtor:    segura [mutex] ──espera──> [vazio]  (só o consumidor libera)
  consumidor:  segura nada     ──espera──> [mutex] (só o produtor libera)
 ```
 
-Nas 3 execuções ele aconteceu logo no começo: 3 amostras produzidas, 0 consumidas, vigia de 1 s encerrou. O travamento depende de o buffer chegar a encher com o produtor segurando o `mutex`; aqui isso aconteceu 3 de 3 vezes. A trava é **total**: não degrada, para.
+Nas 3 execuções ele aconteceu logo no começo: 4 amostras produzidas, 0 consumidas, vigia de 1 s encerrou. O travamento depende de o buffer chegar a encher com o produtor segurando o `mutex`; aqui isso aconteceu 3 de 3 vezes. A trava é **total**: não degrada, para.
 
 ---
 

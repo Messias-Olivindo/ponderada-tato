@@ -1,12 +1,12 @@
 # Ponderada CC08 - Pulseira Tato
 
-Aluno: Messias Olivindo
+Aluno: Messias Fernandes de Olivindo
 
 Repositório com o código e o relatório da ponderada CC08 da pulseira Tato.
 
 ## Como rodar a questão A4 (produtor/consumidor com buffer circular)
 
-Requer Python 3 (somente biblioteca padrão). Cada versão faz 3 execuções em sequência com N = 3 e 20.000 amostras.
+Requer Python 3 (somente biblioteca padrão). Cada versão faz 3 execuções em sequência com N = 4 e 20.000 amostras.
 
 ```
 cd ponderada/codigo && python3 versao1.py
