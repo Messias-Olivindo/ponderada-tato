@@ -238,9 +238,9 @@ Código em [`codigo/`](codigo/). Python 3, N = 4, 20.000 amostras, 3 execuções
 
 | versão | exec. | produzidas | consumidas | perdidas | duplicadas | travou |
 |---|---|---|---|---|---|---|
-| 1 (sem sincronização) | 1 | 20000 | 19998 | 568 | 566 | **sim** |
-| 1 | 2 | 20000 | 19993 | 511 | 504 | **sim** |
-| 1 | 3 | 7109 | 7113 | 179 | 183 | **sim** |
+| 1 (sem sincronização) | 1 | 20000 | 19982 | 645 | 627 | **sim** |
+| 1 | 2 | 19913 | 20000 | 536 | 623 | não |
+| 1 | 3 | 19939 | 20000 | 618 | 679 | não |
 | 2 (semáforos) | 1 | 20000 | 20000 | 0 | 0 | não |
 | 2 | 2 | 20000 | 20000 | 0 | 0 | não |
 | 2 | 3 | 20000 | 20000 | 0 | 0 | não |
@@ -254,9 +254,9 @@ Versão 1 (`python3 versao1.py`):
 
 ```
 Versao 1 (sem sincronizacao) | N=4 | amostras=20000
-RESULTADO versao=1 execucao=1 produzidas=20000 consumidas=19998 perdidas=568 duplicadas=566 travou=sim
-RESULTADO versao=1 execucao=2 produzidas=20000 consumidas=19993 perdidas=511 duplicadas=504 travou=sim
-RESULTADO versao=1 execucao=3 produzidas=7109 consumidas=7113 perdidas=179 duplicadas=183 travou=sim
+RESULTADO versao=1 execucao=1 produzidas=20000 consumidas=19982 perdidas=645 duplicadas=627 travou=sim
+RESULTADO versao=1 execucao=2 produzidas=19913 consumidas=20000 perdidas=536 duplicadas=623 travou=nao
+RESULTADO versao=1 execucao=3 produzidas=19939 consumidas=20000 perdidas=618 duplicadas=679 travou=nao
 ```
 
 ![versão 1](img/a4-versao1.png)
@@ -298,7 +298,7 @@ A região crítica é o trio **ler `ocupadas`, `sleep(0)`, escrever `ocupadas`**
 - **Contador menor que o real:** o produtor acha que há vaga onde ainda há amostra não lida e a sobrescreve. A amostra é **perdida**.
 - **Contador maior que o real:** o consumidor acha que há amostra onde a posição já foi lida e lê de novo. A amostra é **duplicada**.
 
-Nas três execuções o contador corrompido acabou deixando o consumidor 1 s sem receber nada, e o vigia encerrou por travamento. Nas execuções 1 e 2 isso só aconteceu no final, depois de o produtor gerar as 20.000 amostras; na execução 3 aconteceu no meio, com 7.109 produzidas. Em todas houve perda e duplicata: o consumidor leu posições velhas (duplicata) e o produtor sobrescreveu posições não lidas (perda).
+Na execução 1 o contador corrompido deixou o consumidor 1 s sem receber nada no final, depois de o produtor gerar as 20.000 amostras, e o vigia encerrou por travamento. Nas execuções 2 e 3 não houve travamento, mas o erro apareceu do outro lado: o consumidor completou as 20.000 leituras antes de o produtor terminar (19.913 e 19.939 produzidas), porque o contador corrompido o fez ler posições sem amostra nova. Em todas houve perda e duplicata: o consumidor leu posições velhas (duplicata) e o produtor sobrescreveu posições não lidas (perda).
 
 ### O que cada semáforo garante na versão 2
 
