@@ -259,6 +259,8 @@ RESULTADO versao=1 execucao=2 produzidas=20000 consumidas=19993 perdidas=511 dup
 RESULTADO versao=1 execucao=3 produzidas=7109 consumidas=7113 perdidas=179 duplicadas=183 travou=sim
 ```
 
+![versão 1](img/a4-versao1.png)
+
 Versão 2 (`python3 versao2.py`):
 
 ```
@@ -268,6 +270,8 @@ RESULTADO versao=2 execucao=2 produzidas=20000 consumidas=20000 perdidas=0 dupli
 RESULTADO versao=2 execucao=3 produzidas=20000 consumidas=20000 perdidas=0 duplicadas=0 travou=nao
 ```
 
+![versão 2](img/a4-versao2.png)
+
 Versão 3 (`python3 versao3.py`):
 
 ```
@@ -276,6 +280,8 @@ RESULTADO versao=3 execucao=1 produzidas=4 consumidas=0 perdidas=4 duplicadas=0 
 RESULTADO versao=3 execucao=2 produzidas=4 consumidas=0 perdidas=4 duplicadas=0 travou=sim
 RESULTADO versao=3 execucao=3 produzidas=4 consumidas=0 perdidas=4 duplicadas=0 travou=sim
 ```
+
+![versão 3](img/a4-versao3.png)
 
 ### Região crítica da versão 1 e por que perde e duplica
 
